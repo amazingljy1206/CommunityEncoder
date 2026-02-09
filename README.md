@@ -1,4 +1,4 @@
-# CommunityEncoder Official Repository (Final Release)
+# CommunityEncoder Official Repository
 
 This directory is the official public code release for **CommunityEncoder final version**.
 Only the final pretrain/finetune pipeline code is kept.
@@ -11,6 +11,7 @@ Only the final pretrain/finetune pipeline code is kept.
 - `ft_inference_augmented/finetune_user_aff.py`
 - `ft_inference_augmented/finetune_com_agg.py`
 - `ft_inference_augmented/finetune_soc_dim.py`
+- `ft_inference_augmented/finetune_com_emo.py`
 - `ft_inference_augmented/finetune_com_conf.py`
 - `GPT_GNN/` core modules
 - `requirements.txt`

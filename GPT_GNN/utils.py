@@ -20,7 +20,7 @@ _USER_EMBED_NPZ_PATH = _USER_EMBED_PATH.replace(".csv", ".npz")
 
 
 def _load_user_embed_cache_csv(path):
-    """原始 CSV 加载方式（慢，仅作备用）"""
+    """Legacy CSV loading path (slow, fallback only)."""
     cache = {}
     embed_dim = None
     with open(path, "r", encoding="utf-8") as csvfile:
@@ -42,13 +42,13 @@ def _load_user_embed_cache_csv(path):
 
 
 def _load_user_embed_cache_npz(path):
-    """快速加载预处理的 NPZ 文件（推荐）"""
+    """Fast load for preprocessed NPZ files (recommended)."""
     data = np.load(path, allow_pickle=True)
     users = data['users']
     embeddings = data['embeddings']
     embed_dim = int(data['embed_dim'])
     
-    # 构建字典缓存
+    # Build dictionary cache.
     cache = {user: embeddings[i].astype(np.float64) for i, user in enumerate(users)}
     return cache, embed_dim
 
@@ -56,13 +56,13 @@ def _load_user_embed_cache_npz(path):
 def _get_user_embed_cache():
     global _USER_EMBED_CACHE, _USER_EMBED_DIM
     if _USER_EMBED_CACHE is None:
-        # 优先使用 NPZ 格式（快），否则回退到 CSV（慢）
+        # Prefer NPZ format (fast); otherwise fall back to CSV (slow).
         if os.path.exists(_USER_EMBED_NPZ_PATH):
-            print(f"[INFO] 从 NPZ 加载用户嵌入缓存: {_USER_EMBED_NPZ_PATH}")
+            print(f"[INFO] Loading user embedding cache from NPZ: {_USER_EMBED_NPZ_PATH}")
             _USER_EMBED_CACHE, _USER_EMBED_DIM = _load_user_embed_cache_npz(_USER_EMBED_NPZ_PATH)
         else:
-            print(f"[WARN] NPZ 文件不存在，使用慢速 CSV 加载: {_USER_EMBED_PATH}")
-            print(f"[WARN] 建议运行: python GPT_GNN/convert_embed_cache.py 生成 NPZ 文件")
+            print(f"[WARN] NPZ file not found, using slow CSV loading: {_USER_EMBED_PATH}")
+            print(f"[WARN] Recommended: run `python GPT_GNN/convert_embed_cache.py` to generate an NPZ file")
             _USER_EMBED_CACHE, _USER_EMBED_DIM = _load_user_embed_cache_csv(_USER_EMBED_PATH)
     return _USER_EMBED_CACHE, _USER_EMBED_DIM
 

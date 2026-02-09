@@ -1,7 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Date    ：2023/3/18
-# @Author  ：Zhang Xinnong
-# @File    ：pretrain_sample2.py
 """
 this is a DIY version of pretraining:
 (1) pretrain user-graph only
@@ -14,7 +10,7 @@ import sys
 import os
 import hashlib
 import tempfile
-# 把 community_encoder 加入 path，使 train/ 下脚本能 import GPT_GNN（位于上级目录）
+# Add community_encoder to sys.path so scripts under train/ can import GPT_GNN from the parent directory.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from GPT_GNN.data import *
@@ -165,7 +161,7 @@ def _safe_save_ckpt(state_dict, path: str, fallback_dir: str = ''):
                 print(f"[DEBUG] ckpt fallback save failed: {e2}")
                 if not _is_path_too_long_error(e2):
                     raise
-        # 最后兜底：写入极短路径，避免作业中断
+        # Final fallback: write to a very short path to avoid interrupting the job.
         tiny_root = os.path.join(tempfile.gettempdir(), "ce_ckpt")
         os.makedirs(tiny_root, exist_ok=True)
         digest = hashlib.sha1(path.encode("utf-8")).hexdigest()[:12]
@@ -272,11 +268,11 @@ if __name__ == '__main__':
     best_iteration1 = 0
     best_iteration2 = 0
 
-    # 预热用户嵌入缓存，fork 之后可共享内存页，避免 stage2 重新加载 10GB
+    # Warm up user embedding cache so forked workers can share memory pages and avoid reloading 10GB in stage2.
     if args.n_pool > 0:
         _get_user_embed_cache()
 
-    # 复用进程池，避免每个 iteration 重建导致子进程重复加载大缓存
+    # Reuse the process pool to avoid rebuilding it each iteration and reloading large caches in workers.
     pool = mp.Pool(args.n_pool)
     stage_ckpt_dir = _prepare_stage_ckpt_dir(args.stage_ckpt_dir)
     stage_ckpt_fallback_dir = ''
@@ -373,7 +369,7 @@ if __name__ == '__main__':
                     # print("Epoch: %d, (%d / %d)" % (epoch, batch, repeat_num))
                     train_data = [job.get() for job in jobs[:-1]]
                     valid_data = jobs[-1].get()
-                    # 复用进程池，不再每次重建（避免子进程重复加载10GB缓存）
+                    # Reuse the process pool instead of rebuilding it each time (avoids reloading 10GB cache in workers).
                     jobs = prepare_data(pool)
                     et = time.time()
                     # print('Data Preparation: %.1fs' % (et - st))
@@ -496,7 +492,7 @@ if __name__ == '__main__':
             print('Stage Pretraining done! Best epoch: %d, best valid loss: %.3f' % (best_epoch, best_val))
         
     finally:
-        # 训练完成后关闭进程池
+        # Close the process pool after training completes.
         pool.close()
         pool.join()
 

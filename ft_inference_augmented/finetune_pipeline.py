@@ -21,7 +21,7 @@ import argparse
 import random
 import sys
 import os
-# 把 community_encoder 加入 path，使 train/ 下脚本能 import GPT_GNN（位于上级目录）
+# Add community_encoder to sys.path so scripts can import GPT_GNN from the parent directory.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import time
