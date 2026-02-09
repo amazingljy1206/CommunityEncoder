@@ -1,0 +1,20 @@
+# Core
+numpy
+scipy
+pandas
+tqdm
+matplotlib
+scikit-learn
+
+# ML / graph
+torch
+torch-geometric
+
+# NLP
+gensim
+transformers
+
+# Utils
+dill
+texttable
+rich
